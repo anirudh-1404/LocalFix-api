@@ -1,4 +1,5 @@
 import { User } from "../models/userSchema.js";
+import { comparePassword, hashedPassword } from "../utils/hashedPass.js";
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -17,10 +18,11 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
+    const hashed = await hashedPassword(password);
     const user = await User.create({
       name,
       email,
-      password,
+      password: hashed,
     });
 
     return res.status(201).json({
@@ -52,11 +54,22 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
-    return res.status(200).json({
-      message: "Login successfull",
-      id: isUserExists._id,
-      data: { isUserExists },
-    });
+    const isPasswordCorrect = await comparePassword(
+      password,
+      isUserExists.password,
+    );
+
+    if (isPasswordCorrect) {
+      return res.status(200).json({
+        message: "Login successfull",
+        id: isUserExists._id,
+        data: { email: email },
+      });
+    } else {
+      return res.status(403).json({
+        message: "Invalid credentials",
+      });
+    }
   } catch (err) {
     return res.status(500).json({
       message: err.message,
