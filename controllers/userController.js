@@ -36,8 +36,14 @@ export const registerUser = async (req, res, next) => {
 
     return res.status(201).json({
       message: "User created successfully",
-      id: user._id,
-      data: { user },
+      success: true,
+      data: {
+        _id: user._id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+      },
+      token
     });
   } catch (err) {
     return res.status(500).json({
@@ -78,14 +84,61 @@ export const loginUser = async (req, res, next) => {
       });
       return res.status(200).json({
         message: "Login successfull",
-        id: isUserExists._id,
-        data: { email: email },
+        success: true,
+        data: {
+          _id: isUserExists._id,
+          name: isUserExists.name,
+          role: isUserExists.role,
+          email: isUserExists.email,
+        },
+        token
       });
     } else {
       return res.status(403).json({
         message: "Invalid credentials",
       });
     }
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+export const assignAdminRole = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { email },
+      { role: "admin" },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: `User ${email} promoted to admin successfully`,
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
   } catch (err) {
     return res.status(500).json({
       message: err.message,
