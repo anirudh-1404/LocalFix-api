@@ -10,6 +10,8 @@ import userRoutes from "./routes/userRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import providerRoutes from "./routes/providerRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import problemRoutes from "./routes/problemRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js"
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -20,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "*",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -34,6 +36,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", userRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/providers", providerRoutes);
+app.use("/api/problems", problemRoutes);
+app.use("/api/cart", cartRoutes);
 
 
 const startServer = async () => {
