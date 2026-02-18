@@ -38,6 +38,9 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/providers", providerRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/cart", cartRoutes);
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ message: "Server is running", status: "ok" });
+});
 
 
 const startServer = async () => {
