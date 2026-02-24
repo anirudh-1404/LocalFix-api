@@ -29,8 +29,7 @@ export const enrollProvider = async (req, res) => {
             path: file.path
         })) || [];
 
-        const provider = await Provider.create({
-            user: userId || null,
+        const providerData = {
             email,
             ownerName,
             phone,
@@ -58,7 +57,13 @@ export const enrollProvider = async (req, res) => {
                 idImage,
             },
             documents: otherDocs,
-        });
+        };
+
+        if (userId) {
+            providerData.user = userId;
+        }
+
+        const provider = await Provider.create(providerData);
 
         res.status(201).json({
             message: "Enrollment request submitted successfully",
